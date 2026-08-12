@@ -1002,16 +1002,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
     arrayUnion, increment
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-  // Config thật của dự án hieudecamthong-71315 (Firebase console → Project settings → General → Your apps → SDK setup)
-  const firebaseConfig = {
-    apiKey: "AIzaSyDKt1GtNHT_zqI8kSD_uPROpxpf-7LmYOs",
-    authDomain: "hieudecamthong-71315.firebaseapp.com",
-    projectId: "hieudecamthong-71315",
-    storageBucket: "hieudecamthong-71315.firebasestorage.app",
-    messagingSenderId: "148426883582",
-    appId: "1:148426883582:web:a57e1b45349033d15fc0af"
-  };
-
+const firebaseConfig = {
+  apiKey: "AIzaSyDKt1GtNHT_zqI8kSD_uPROpxpf-7LmYOs",
+  authDomain: "hieudecamthong-71315.firebaseapp.com",
+  databaseURL: "https://hieudecamthong-71315-default-rtdb.firebaseio.com",
+  projectId: "hieudecamthong-71315",
+  storageBucket: "hieudecamthong-71315.firebasestorage.app",
+  messagingSenderId: "148426883582",
+  appId: "1:148426883582:web:a57e1b45349033d15fc0af",
+  measurementId: "G-SC00EDE2HT"
+};
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -1422,3 +1422,5 @@ function fRenderDetail(id){
 </script>
 </body>
 </html>
+
+
