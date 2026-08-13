@@ -305,6 +305,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
   .font-option[data-f="mono"]{font-family:'JetBrains Mono',monospace;}
 
 
+  /* ── AUTH WIDGET IN TOP-RIGHT TOOLBAR ── */
+  .auth-trigger{position:relative;padding:0;overflow:visible;}
+  .auth-trigger-avatar{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;overflow:hidden;color:var(--purple);background:var(--purple-light);}
+  .auth-trigger-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .auth-panel{position:absolute;top:calc(100% + 8px);right:0;background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:12px;padding:14px;min-width:230px;box-shadow:0 8px 32px rgba(0,0,0,0.18);display:none;z-index:600;text-align:left;}
+  .auth-panel.open{display:block;}
+
+
   .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px;position:relative;overflow:hidden;}
   .hero-bg{position:absolute;inset:0;background:linear-gradient(160deg,var(--purple-light) 0%,var(--bg) 50%,var(--teal-light) 100%);z-index:0;transition:background .25s;}
   .hero-blob{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(108,99,255,0.12) 0%,transparent 70%);top:-100px;right:-100px;border-radius:50%;animation:float 8s ease-in-out infinite;}
@@ -374,6 +382,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
   .solution-card ul{list-style:none;display:flex;flex-direction:column;gap:8px;}
   .solution-card ul li{font-size:0.88rem;color:var(--mid);padding-left:20px;position:relative;line-height:1.55;}
   .solution-card ul li::before{content:'→';position:absolute;left:0;color:var(--teal);font-weight:700;}
+  .sol-text{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .solution-card ul li.expanded .sol-text{-webkit-line-clamp:unset;display:block;overflow:visible;}
+  .sol-toggle{display:inline-block;margin-top:4px;font-size:0.78rem;color:var(--purple);cursor:pointer;font-weight:700;background:none;border:none;padding:0;font-family:var(--font);}
+  .sol-toggle:hover{text-decoration:underline;}
 
 
   .signs-section{background:var(--section-alt);}
@@ -587,6 +599,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
   .btn-google svg{width:16px;height:16px;flex-shrink:0;}
   .btn-logout-sm{background:none;border:none;color:var(--soft);cursor:pointer;font-size:11px;font-family:var(--font);padding:4px 6px;border-radius:6px;flex-shrink:0;}
   .btn-logout-sm:hover{color:var(--warn);background:var(--warn-light);}
+  .avatar-edit-wrap{position:relative;flex-shrink:0;}
+  .avatar-edit-btn{position:absolute;bottom:-2px;right:-2px;width:16px;height:16px;border-radius:50%;background:var(--purple);color:#fff;border:2px solid var(--panel-bg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;padding:0;line-height:1;}
+  .avatar-edit-btn:hover{opacity:.85;}
+  .avatar-edit-btn svg{width:9px;height:9px;}
+  .btn-change-avatar{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--toggle-bg);border:1.5px solid var(--border);color:var(--mid);padding:9px 14px;border-radius:10px;font-family:var(--font);font-size:12.5px;font-weight:600;cursor:pointer;transition:border-color .15s,background .15s,color .15s;margin-top:8px;}
+  .btn-change-avatar:hover{border-color:var(--purple);background:var(--purple-light);color:var(--purple);}
+  .btn-change-avatar:disabled{opacity:.6;cursor:not-allowed;}
+  .btn-change-avatar svg{width:14px;height:14px;flex-shrink:0;}
 
 
   /* ─── RESPONSIVE ─── */
@@ -625,6 +645,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
     <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     <svg class="icon-sun"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
   </button>
+  <div class="toolbar-btn auth-trigger" onclick="toggleAuthPanel(event)" title="Tài khoản">
+    <div class="auth-trigger-avatar" id="auth-trigger-avatar">👤</div>
+    <div class="auth-panel" id="auth-slot">
+      <!-- Filled by JS: login button OR profile -->
+    </div>
+  </div>
 </div>
 
 
@@ -644,7 +670,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
   <nav class="sidebar-nav">
     <div class="sidebar-section-label">Nội dung</div>
     <a href="#aspd" onclick="closeSidebar()"><div class="nav-icon">❓</div>ASPD là gì?</a>
-    <a href="#khainiemq" onclick="closeSidebar()"><div class="nav-icon">📖</div>Khái niệm</a>
     <a href="#dauhieu" onclick="closeSidebar()"><div class="nav-icon">⚠️</div>Dấu hiệu</a>
     <a href="#yeutoaff" onclick="closeSidebar()"><div class="nav-icon">🔍</div>Yếu tố ảnh hưởng</a>
     <a href="#giaiphap" onclick="closeSidebar()"><div class="nav-icon">💡</div>Giải pháp</a>
@@ -658,13 +683,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
 
 
     <div class="sidebar-section-label" style="margin-top:8px;">Khác</div>
+    <a href="#khainiemq" onclick="closeSidebar()"><div class="nav-icon">📖</div>Khái niệm liên quan</a>
     <a href="#tailieu" onclick="closeSidebar()"><div class="nav-icon">📚</div>Tài liệu tham khảo</a>
     <a href="#lienhe" onclick="closeSidebar()"><div class="nav-icon">📧</div>Liên hệ</a>
   </nav>
 
-  <div class="sidebar-footer" id="auth-slot">
-    <!-- Filled by JS: login button OR profile -->
-  </div>
 </aside>
 
 
@@ -734,25 +757,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
         <div class="what-stat"><div class="stat-icon warn">🤝</div><div class="stat-text"><strong>Trải nghiệm thời thơ ấu</strong><span>Môi trường sống, tác động đồng đẳng</span></div></div>
         <div class="what-stat"><div class="stat-icon purple">💊</div><div class="stat-text"><strong>Có thể can thiệp</strong><span>Liệu pháp tâm lý & hỗ trợ chuyên sâu</span></div></div>
       </div>
-    </div>
-  </div>
-</section>
-
-
-<section id="khainiemq" class="concepts-section">
-  <div class="container">
-    <div class="section-label">Cơ sở lý luận</div>
-    <h2 class="section-title">Các khái niệm liên quan</h2>
-    <p class="section-desc">Nền tảng lý thuyết giúp hiểu đúng về hành vi chống đối xã hội ở học sinh.</p>
-    <div class="concepts-grid">
-      <div class="concept-card"><h3>Hành vi chống đối xã hội</h3><span class="en-label">Antisocial Behavior</span><p>Các hành vi vi phạm chuẩn mực xã hội hoặc xâm phạm quyền lợi, cảm xúc và sự an toàn của người khác. Thường có tính lặp lại, khởi phát từ thời thơ ấu và kéo dài đến tuổi trưởng thành nếu không có sự can thiệp phù hợp.</p></div>
-      <div class="concept-card"><h3>Chuẩn mực xã hội</h3><span class="en-label">Social Norms</span><p>Các quy tắc không chính thức điều chỉnh hành vi con người trong xã hội. Tuân thủ chuẩn mực chịu ảnh hưởng từ "Chuẩn mực mô tả" và "Kỳ vọng chuẩn mực" — hành vi quan sát từ người khác tác động đáng kể đến lựa chọn của cá nhân.</p></div>
-      <div class="concept-card"><h3>Tính hung hăng</h3><span class="en-label">Aggression</span><p>Xu hướng hoặc hành vi có chủ đích nhằm gây tổn hại về thể chất hoặc tâm lý đối với người khác. Đây là một trong những biểu hiện đặc trưng thường gặp trong các rối loạn hành vi.</p></div>
-      <div class="concept-card"><h3>Tính bốc đồng</h3><span class="en-label">Impulsivity</span><p>Xu hướng hành động nhanh chóng, thiếu cân nhắc và khó kiểm soát phản ứng trước các kích thích. Đặc điểm này có thể làm gia tăng nguy cơ xuất hiện các hành vi lệch chuẩn.</p></div>
-      <div class="concept-card"><h3>Sự đồng cảm</h3><span class="en-label">Empathy</span><p>Khả năng nhận biết, thấu hiểu và chia sẻ cảm xúc của người khác (Hoffman, 2000; Davis, 1983). Mức độ đồng cảm thấp thường được xem là yếu tố liên quan đến các biểu hiện chống đối xã hội.</p></div>
-      <div class="concept-card"><h3>Sự phát triển đạo đức</h3><span class="en-label">Moral Development</span><p>Mức độ phát triển khả năng nhận thức và đánh giá các vấn đề đạo đức, từ đó định hướng hành vi phù hợp với chuẩn mực xã hội (Kohlberg, 1984).</p></div>
-      <div class="concept-card"><h3>Ảnh hưởng của bạn bè</h3><span class="en-label">Peer Influence</span><p>Hiện tượng cá nhân thay đổi thái độ, hành vi, giá trị hoặc lối sống để phù hợp với những người cùng nhóm tuổi. Đặc biệt mạnh mẽ trong giai đoạn vị thành niên.</p></div>
-      <div class="concept-card"><h3>Khả năng tự kiểm soát</h3><span class="en-label">Self-Control</span><p>Cuộc xung đột nội tâm giữa ham muốn tức thời và mục tiêu lý trí dài hạn. Hoạt động như một "cơ bắp" — có thể mệt mỏi khi dùng liên tục nhưng cũng có thể được tăng cường qua luyện tập.</p></div>
     </div>
   </div>
 </section>
@@ -829,9 +833,28 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
     <h2 class="section-title">Một số giải pháp</h2>
     <p class="section-desc">Các khuyến nghị dành cho từng nhóm đối tượng trong môi trường học đường.</p>
     <div class="solutions-grid">
-      <div class="solution-card"><span class="sol-icon">🏠</span><h3>Đối với gia đình</h3><ul><li>xây dựng phương pháp giáo dục phù hợp, kết hợp giữa sự quan tâm, định hướng và tôn trọng con cái, tránh cả việc kiểm soát quá mức lẫn buông lỏng quản lý.</li><li>Tăng cường giao tiếp, lắng nghe và chia sẻ với con để tạo môi trường gia đình tích cực, giúp con cảm thấy được thấu hiểu và hỗ trợ về mặt cảm xúc.</li><li>Tôn trọng quyền riêng tư và nhu cầu tự chủ của con trong giới hạn hợp lý, đồng thời hướng dẫn con chịu trách nhiệm với hành vi của bản thân.</li><li>Quan tâm đến những thay đổi trong cảm xúc và hành vi dù là nhỏ nhất của con, kịp thời phối hợp với nhà trường khi phát hiện các dấu hiệu bất thường.</li><li>Hạn chế việc so sánh con với bạn bè, anh chị em hoặc đặt kỳ vọng quá cao, vì điều này có thể làm gia tăng cảm giác thất bại, chống đối hoặc phản ứng tiêu cực.</li><li>Khi con làm tổn thương người khác, gia đình nên yêu cầu con thực hiện hành động phù hợp để sửa chữa hậu quả như xin lỗi, hoàn trả hoặc khắc phục thiệt hại thay vì chỉ yêu cầu "hứa không tái phạm".</li></ul></div>
-      <div class="solution-card"><span class="sol-icon">🏫</span><h3>Đối với nhà trường</h3><ul><li>Xây dựng môi trường học tập thân thiện, tích cực, giảm áp lực thành tích không cần thiết và khuyến khích sự phát triển toàn diện của học sinh.</li><li>Tăng cường và nâng cao chất lượng của hoạt động tư vấn tâm lý học đường nhằm hỗ trợ học sinh giải quyết khó khăn về cảm xúc, hành vi và các mối quan hệ xã hội.</li><li>Tổ chức các chương trình giáo dục kỹ năng sống, kỹ năng kiểm soát cảm xúc, giải quyết xung đột và ứng xử văn minh trong môi trường học đường.</li><li>Đẩy mạnh sự phối hợp giữa gia đình và nhà trường trong việc theo dõi, hỗ trợ và định hướng hành vi của học sinh.</li><li>Tổ chức các tình huống mô phỏng về việc bị bạn bè rủ rê đánh nhau, bắt nạt hoặc vi phạm nội quy, sau đó cho học sinh thực hành cách từ chối và rời khỏi tình huống.</li></ul></div>
-      <div class="solution-card"><span class="sol-icon">🎒</span><h3>Đối với học sinh</h3><ul><li>Chủ động rèn luyện khả năng tự kiểm soát cảm xúc và hành vi, cân nhắc hậu quả trước khi đưa ra quyết định.</li><li>Lựa chọn và xây dựng các mối quan hệ bạn bè lành mạnh, tránh bị tác động bởi những hành vi tiêu cực từ nhóm đồng đẳng.</li><li>Tích cực tham gia các hoạt động ngoại khóa, hoạt động xã hội nhằm nâng cao tinh thần trách nhiệm, sự đồng cảm và ý thức cộng đồng.</li><li>Chủ động chia sẻ những khó khăn, áp lực trong học tập, các mối quan hệ hoặc cảm xúc cá nhân với cha mẹ, người thân và giáo viên để nhận được sự hỗ trợ, định hướng kịp thời, tránh tích tụ cảm xúc tiêu cực dẫn đến các hành vi chống đối.</li><li>Những học sinh muốn khẳng định bản thân có thể tham gia thể thao, hoạt động lãnh đạo, cuộc thi hoặc dự án nhóm để đạt được sự công nhận thông qua năng lực thay vì hành vi gây hấn.</li></ul></div>
+      <div class="solution-card"><span class="sol-icon">🏠</span><h3>Đối với gia đình</h3><ul>
+        <li><span class="sol-text">Xây dựng phương pháp giáo dục phù hợp, kết hợp giữa sự quan tâm, định hướng và tôn trọng con cái, tránh cả việc kiểm soát quá mức lẫn buông lỏng quản lý.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+        <li><span class="sol-text">Tăng cường giao tiếp, lắng nghe và chia sẻ với con để tạo môi trường gia đình tích cực, giúp con cảm thấy được thấu hiểu và hỗ trợ về mặt cảm xúc.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+        <li><span class="sol-text">Tôn trọng quyền riêng tư và nhu cầu tự chủ của con trong giới hạn hợp lý, đồng thời hướng dẫn con chịu trách nhiệm với hành vi của bản thân.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+        <li><span class="sol-text">Quan tâm đến những thay đổi trong cảm xúc và hành vi dù là nhỏ nhất của con, kịp thời phối hợp với nhà trường khi phát hiện các dấu hiệu bất thường.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+        <li><span class="sol-text">Hạn chế việc so sánh con với bạn bè, anh chị em hoặc đặt kỳ vọng quá cao, vì điều này có thể làm gia tăng cảm giác thất bại, chống đối hoặc phản ứng tiêu cực.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+        <li><span class="sol-text">Khi con làm tổn thương người khác, gia đình nên yêu cầu con thực hiện hành động phù hợp để sửa chữa hậu quả như xin lỗi, hoàn trả hoặc khắc phục thiệt hại thay vì chỉ yêu cầu "hứa không tái phạm".</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+      </ul></div>
+      <div class="solution-card"><span class="sol-icon">🏫</span><h3>Đối với nhà trường</h3><ul>
+        <li><span class="sol-text">Xây dựng môi trường học tập thân thiện, tích cực, giảm áp lực thành tích không cần thiết và khuyến khích sự phát triển toàn diện của học sinh.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+        <li><span class="sol-text">Tăng cường và nâng cao chất lượng của hoạt động tư vấn tâm lý học đường nhằm hỗ trợ học sinh giải quyết khó khăn về cảm xúc, hành vi và các mối quan hệ xã hội.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+        <li><span class="sol-text">Tổ chức các chương trình giáo dục kỹ năng sống, kỹ năng kiểm soát cảm xúc, giải quyết xung đột và ứng xử văn minh trong môi trường học đường.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+        <li><span class="sol-text">Đẩy mạnh sự phối hợp giữa gia đình và nhà trường trong việc theo dõi, hỗ trợ và định hướng hành vi của học sinh.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+        <li><span class="sol-text">Tổ chức các tình huống mô phỏng về việc bị bạn bè rủ rê đánh nhau, bắt nạt hoặc vi phạm nội quy, sau đó cho học sinh thực hành cách từ chối và rời khỏi tình huống.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+      </ul></div>
+      <div class="solution-card"><span class="sol-icon">🎒</span><h3>Đối với học sinh</h3><ul>
+        <li><span class="sol-text">Chủ động rèn luyện khả năng tự kiểm soát cảm xúc và hành vi, cân nhắc hậu quả trước khi đưa ra quyết định.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+        <li><span class="sol-text">Lựa chọn và xây dựng các mối quan hệ bạn bè lành mạnh, tránh bị tác động bởi những hành vi tiêu cực từ nhóm đồng đẳng.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+        <li><span class="sol-text">Tích cực tham gia các hoạt động ngoại khóa, hoạt động xã hội nhằm nâng cao tinh thần trách nhiệm, sự đồng cảm và ý thức cộng đồng.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+        <li><span class="sol-text">Chủ động chia sẻ những khó khăn, áp lực trong học tập, các mối quan hệ hoặc cảm xúc cá nhân với cha mẹ, người thân và giáo viên để nhận được sự hỗ trợ, định hướng kịp thời, tránh tích tụ cảm xúc tiêu cực dẫn đến các hành vi chống đối.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+        <li><span class="sol-text">Những học sinh muốn khẳng định bản thân có thể tham gia thể thao, hoạt động lãnh đạo, cuộc thi hoặc dự án nhóm để đạt được sự công nhận thông qua năng lực thay vì hành vi gây hấn.</span><button class="sol-toggle" onclick="toggleSol(this)">Nhấn để xem thêm</button></li>
+      </ul></div>
     </div>
   </div>
 </section>
@@ -932,6 +955,25 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
 </section>
 
 
+<section id="khainiemq" class="concepts-section">
+  <div class="container">
+    <div class="section-label">Cơ sở lý luận</div>
+    <h2 class="section-title">Các khái niệm liên quan</h2>
+    <p class="section-desc">Nền tảng lý thuyết giúp hiểu đúng về hành vi chống đối xã hội ở học sinh.</p>
+    <div class="concepts-grid">
+      <div class="concept-card"><h3>Hành vi chống đối xã hội</h3><span class="en-label">Antisocial Behavior</span><p>Các hành vi vi phạm chuẩn mực xã hội hoặc xâm phạm quyền lợi, cảm xúc và sự an toàn của người khác. Thường có tính lặp lại, khởi phát từ thời thơ ấu và kéo dài đến tuổi trưởng thành nếu không có sự can thiệp phù hợp.</p></div>
+      <div class="concept-card"><h3>Chuẩn mực xã hội</h3><span class="en-label">Social Norms</span><p>Các quy tắc không chính thức điều chỉnh hành vi con người trong xã hội. Tuân thủ chuẩn mực chịu ảnh hưởng từ "Chuẩn mực mô tả" và "Kỳ vọng chuẩn mực" — hành vi quan sát từ người khác tác động đáng kể đến lựa chọn của cá nhân.</p></div>
+      <div class="concept-card"><h3>Tính hung hăng</h3><span class="en-label">Aggression</span><p>Xu hướng hoặc hành vi có chủ đích nhằm gây tổn hại về thể chất hoặc tâm lý đối với người khác. Đây là một trong những biểu hiện đặc trưng thường gặp trong các rối loạn hành vi.</p></div>
+      <div class="concept-card"><h3>Tính bốc đồng</h3><span class="en-label">Impulsivity</span><p>Xu hướng hành động nhanh chóng, thiếu cân nhắc và khó kiểm soát phản ứng trước các kích thích. Đặc điểm này có thể làm gia tăng nguy cơ xuất hiện các hành vi lệch chuẩn.</p></div>
+      <div class="concept-card"><h3>Sự đồng cảm</h3><span class="en-label">Empathy</span><p>Khả năng nhận biết, thấu hiểu và chia sẻ cảm xúc của người khác (Hoffman, 2000; Davis, 1983). Mức độ đồng cảm thấp thường được xem là yếu tố liên quan đến các biểu hiện chống đối xã hội.</p></div>
+      <div class="concept-card"><h3>Sự phát triển đạo đức</h3><span class="en-label">Moral Development</span><p>Mức độ phát triển khả năng nhận thức và đánh giá các vấn đề đạo đức, từ đó định hướng hành vi phù hợp với chuẩn mực xã hội (Kohlberg, 1984).</p></div>
+      <div class="concept-card"><h3>Ảnh hưởng của bạn bè</h3><span class="en-label">Peer Influence</span><p>Hiện tượng cá nhân thay đổi thái độ, hành vi, giá trị hoặc lối sống để phù hợp với những người cùng nhóm tuổi. Đặc biệt mạnh mẽ trong giai đoạn vị thành niên.</p></div>
+      <div class="concept-card"><h3>Khả năng tự kiểm soát</h3><span class="en-label">Self-Control</span><p>Cuộc xung đột nội tâm giữa ham muốn tức thời và mục tiêu lý trí dài hạn. Hoạt động như một "cơ bắp" — có thể mệt mỏi khi dùng liên tục nhưng cũng có thể được tăng cường qua luyện tập.</p></div>
+    </div>
+  </div>
+</section>
+
+
 <section id="tailieu" class="ref-section">
   <div class="container">
     <div class="section-label">Nguồn tham khảo</div>
@@ -985,6 +1027,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
 
 
 <div class="toast" id="toast"></div>
+<input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="handleAvatarFile(event)">
 
 
 <!-- ══════════════════════════════════════════
@@ -994,13 +1037,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
   import {
     getAuth, GoogleAuthProvider, signInWithPopup, signInAnonymously,
-    onAuthStateChanged, signOut, linkWithPopup
+    onAuthStateChanged, signOut, linkWithPopup, updateProfile
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
   import {
     getFirestore, doc, setDoc, getDoc, updateDoc, collection,
     addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc,
     arrayUnion, increment
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import {
+    getStorage, ref as storageRef, uploadBytes, getDownloadURL
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
   
 const firebaseConfig = {
   apiKey: "AIzaSyDKt1GtNHT_zqI8kSD_uPROpxpf-7LmYOs",
@@ -1015,13 +1061,15 @@ const firebaseConfig = {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  const storage = getStorage(app);
 
   // Expose to the non-module script below via window
   window.__fb = {
-    auth, db, GoogleAuthProvider, signInWithPopup, signInAnonymously,
+    auth, db, storage, GoogleAuthProvider, signInWithPopup, signInAnonymously,
     onAuthStateChanged, signOut, doc, setDoc, getDoc, updateDoc, collection,
     addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc,
-    arrayUnion, increment
+    arrayUnion, increment, updateProfile,
+    storageRef, uploadBytes, getDownloadURL
   };
   window.dispatchEvent(new Event('fb-ready'));
 </script>
@@ -1059,8 +1107,17 @@ async function saveUserPrefs(){
   if(!window.__fb||!currentUser)return;
   try{await window.__fb.updateDoc(window.__fb.doc(window.__fb.db,'users',currentUser.uid),{prefs:_prefsCache});}catch(e){/* doc may not exist yet; ignored, profile creation writes prefs too */}
 }
-function toggleFontPanel(e){e.stopPropagation();document.getElementById('font-panel').classList.toggle('open');}
-document.addEventListener('click',()=>document.getElementById('font-panel').classList.remove('open'));
+function toggleFontPanel(e){e.stopPropagation();document.getElementById('font-panel').classList.toggle('open');document.getElementById('auth-slot').classList.remove('open');}
+function toggleAuthPanel(e){e.stopPropagation();document.getElementById('auth-slot').classList.toggle('open');document.getElementById('font-panel').classList.remove('open');}
+document.addEventListener('click',()=>{document.getElementById('font-panel').classList.remove('open');document.getElementById('auth-slot').classList.remove('open');});
+
+
+/* ── SOLUTION LIST "XEM THÊM" TOGGLE ── */
+function toggleSol(btn){
+  const li=btn.closest('li');
+  li.classList.toggle('expanded');
+  btn.textContent = li.classList.contains('expanded') ? 'Thu gọn' : 'Nhấn để xem thêm';
+}
 
 
 /* ── TOAST ── */
@@ -1099,29 +1156,40 @@ async function ensureUserProfile(user){
 }
 
 function renderAuthSlot(){
-  const slot=document.getElementById('auth-slot');
+  const avatarEl=document.getElementById('auth-trigger-avatar');
+  const panel=document.getElementById('auth-slot');
   if(!currentUser){
-    slot.innerHTML=`<button class="btn-google" onclick="loginGoogle()">
+    avatarEl.textContent='👤';
+    panel.innerHTML=`<button class="btn-google" onclick="loginGoogle()">
       <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.6 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34.5 6.1 29.5 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.3 0 10.1-2 13.7-5.4l-6.3-5.3C29.4 35 26.8 36 24 36c-5.4 0-9.9-3.4-11.5-8.2l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.9 2.7-2.7 4.9-5.1 6.4l6.3 5.3C39.9 36.6 44 31 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
       Đăng nhập bằng Google
     </button>`;
     return;
   }
   const p=currentProfile||{};
+  if(p.photoURL){avatarEl.innerHTML=`<img src="${p.photoURL}" alt="">`;}
+  else{avatarEl.textContent=(p.displayName||'?')[0];}
   const avatarHtml = p.photoURL
     ? `<img class="auth-avatar" src="${p.photoURL}" alt="">`
     : `<div class="auth-avatar" style="display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--purple);">${(p.displayName||'?')[0]}</div>`;
-  slot.innerHTML=`<div class="auth-box">
-    <div class="auth-profile">
+  panel.innerHTML=`<div class="auth-box">
+    <div class="avatar-edit-wrap">
       ${avatarHtml}
-      <div style="min-width:0;">
-        <div class="auth-name">${p.displayName||'Người dùng'}</div>
-        <div class="auth-role">${currentUser.isAnonymous?'Ẩn danh':'Đã liên kết Google'}</div>
-      </div>
+      <button class="avatar-edit-btn" onclick="event.stopPropagation();triggerAvatarUpload()" title="Đổi ảnh đại diện">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+      </button>
     </div>
-    ${currentUser.isAnonymous?'<button class="btn-logout-sm" onclick="loginGoogle()">Liên kết Google</button>':''}
+    <div style="min-width:0;flex:1;">
+      <div class="auth-name">${p.displayName||'Người dùng'}</div>
+      <div class="auth-role">${currentUser.isAnonymous?'Ẩn danh':'Đã liên kết Google'}</div>
+    </div>
     <button class="btn-logout-sm" onclick="doLogout()">Thoát</button>
-  </div>`;
+  </div>
+  <button class="btn-change-avatar" id="btn-change-avatar" onclick="event.stopPropagation();triggerAvatarUpload()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+    Đổi ảnh đại diện
+  </button>
+  ${currentUser.isAnonymous?'<button class="btn-google" style="margin-top:8px;" onclick="loginGoogle()">Liên kết Google</button>':''}`;
 }
 
 async function loginGoogle(){
@@ -1155,6 +1223,70 @@ async function doLogout(){
     await signOut(auth);
     showToast('Đã đăng xuất');
   });
+}
+
+/* ── AVATAR UPLOAD FROM DEVICE ── */
+function triggerAvatarUpload(){
+  if(!currentUser){showToast('Vui lòng đợi phiên đăng nhập được khởi tạo');return;}
+  document.getElementById('avatar-file-input').value='';
+  document.getElementById('avatar-file-input').click();
+}
+function resizeImageFile(file,maxSize){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    const url=URL.createObjectURL(file);
+    img.onload=()=>{
+      let {width,height}=img;
+      if(width>height){ if(width>maxSize){height=Math.round(height*maxSize/width);width=maxSize;} }
+      else{ if(height>maxSize){width=Math.round(width*maxSize/height);height=maxSize;} }
+      const canvas=document.createElement('canvas');
+      canvas.width=width;canvas.height=height;
+      const ctx=canvas.getContext('2d');
+      // center-crop to square for a clean avatar
+      const side=Math.min(width,height);
+      canvas.width=side;canvas.height=side;
+      ctx.drawImage(img,(width-side)/2 - (width-img.width* (width/img.width) )*0,0); // fallback no-op safeguard
+      ctx.clearRect(0,0,side,side);
+      const scale=side/Math.min(img.width,img.height);
+      const sw=side/scale, sh=side/scale;
+      const sx=(img.width-sw)/2, sy=(img.height-sh)/2;
+      ctx.drawImage(img,sx,sy,sw,sh,0,0,side,side);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(blob=>{
+        if(blob)resolve(blob);else reject(new Error('Không thể xử lý ảnh'));
+      },'image/jpeg',0.88);
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Không thể đọc ảnh'));};
+    img.src=url;
+  });
+}
+async function handleAvatarFile(e){
+  const file=e.target.files&&e.target.files[0];
+  if(!file)return;
+  if(!file.type.startsWith('image/')){showToast('Vui lòng chọn một tệp ảnh');return;}
+  if(file.size>10*1024*1024){showToast('Ảnh quá lớn (tối đa 10MB)');return;}
+  if(!currentUser){showToast('Chưa sẵn sàng, thử lại sau');return;}
+  const btn=document.getElementById('btn-change-avatar');
+  if(btn){btn.disabled=true;btn.textContent='Đang tải ảnh lên…';}
+  try{
+    const blob=await resizeImageFile(file,320);
+    const {db,doc,updateDoc,storage,storageRef,uploadBytes,getDownloadURL,updateProfile,auth}=window.__fb;
+    const path='avatars/'+currentUser.uid+'.jpg';
+    const ref=storageRef(storage,path);
+    await uploadBytes(ref,blob,{contentType:'image/jpeg'});
+    const url=await getDownloadURL(ref);
+    const bust=url+(url.includes('?')?'&':'?')+'t='+Date.now();
+    await updateDoc(doc(db,'users',currentUser.uid),{photoURL:bust,updatedAt:window.__fb.serverTimestamp()});
+    try{ if(updateProfile) await updateProfile(auth.currentUser,{photoURL:bust}); }catch(_e){/* optional */}
+    currentProfile={...(currentProfile||{}),photoURL:bust};
+    renderAuthSlot();
+    showToast('Đã cập nhật ảnh đại diện!');
+  }catch(err){
+    console.error(err);
+    showToast('Không thể tải ảnh lên: '+(err.code||err.message||''));
+  }finally{
+    if(btn){btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>Đổi ảnh đại diện';}
+  }
 }
 
 fbReady(()=>{
@@ -1422,5 +1554,3 @@ function fRenderDetail(id){
 </script>
 </body>
 </html>
-
-
