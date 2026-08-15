@@ -1044,10 +1044,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
     addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc,
     arrayUnion, increment
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-  import {
-    getStorage, ref as storageRef, uploadBytes, getDownloadURL
-  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
-  
+
 const firebaseConfig = {
   apiKey: "AIzaSyDKt1GtNHT_zqI8kSD_uPROpxpf-7LmYOs",
   authDomain: "hieudecamthong-71315.firebaseapp.com",
@@ -1064,13 +1061,12 @@ const firebaseConfig = {
   const storage = getStorage(app);
 
   // Expose to the non-module script below via window
-  window.__fb = {
-    auth, db, storage, GoogleAuthProvider, signInWithPopup, signInAnonymously,
-    onAuthStateChanged, signOut, doc, setDoc, getDoc, updateDoc, collection,
-    addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc,
-    arrayUnion, increment, updateProfile,
-    storageRef, uploadBytes, getDownloadURL
-  };
+window.__fb = {
+  auth, db, GoogleAuthProvider, signInWithPopup, signInAnonymously,
+  onAuthStateChanged, signOut, doc, setDoc, getDoc, updateDoc, collection,
+  addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc,
+  arrayUnion, increment, updateProfile
+};
   window.dispatchEvent(new Event('fb-ready'));
 </script>
 
@@ -1231,35 +1227,26 @@ function triggerAvatarUpload(){
   document.getElementById('avatar-file-input').value='';
   document.getElementById('avatar-file-input').click();
 }
-function resizeImageFile(file,maxSize){
+/* ── AVATAR: resize + nén thành base64, lưu thẳng vào Firestore ── */
+function fileToBase64Avatar(file,size){
   return new Promise((resolve,reject)=>{
     const img=new Image();
     const url=URL.createObjectURL(file);
     img.onload=()=>{
-      let {width,height}=img;
-      if(width>height){ if(width>maxSize){height=Math.round(height*maxSize/width);width=maxSize;} }
-      else{ if(height>maxSize){width=Math.round(width*maxSize/height);height=maxSize;} }
+      const side=Math.min(img.width,img.height);
+      const sx=(img.width-side)/2, sy=(img.height-side)/2;
       const canvas=document.createElement('canvas');
-      canvas.width=width;canvas.height=height;
+      canvas.width=size;canvas.height=size;
       const ctx=canvas.getContext('2d');
-      // center-crop to square for a clean avatar
-      const side=Math.min(width,height);
-      canvas.width=side;canvas.height=side;
-      ctx.drawImage(img,(width-side)/2 - (width-img.width* (width/img.width) )*0,0); // fallback no-op safeguard
-      ctx.clearRect(0,0,side,side);
-      const scale=side/Math.min(img.width,img.height);
-      const sw=side/scale, sh=side/scale;
-      const sx=(img.width-sw)/2, sy=(img.height-sh)/2;
-      ctx.drawImage(img,sx,sy,sw,sh,0,0,side,side);
+      ctx.drawImage(img,sx,sy,side,side,0,0,size,size);
       URL.revokeObjectURL(url);
-      canvas.toBlob(blob=>{
-        if(blob)resolve(blob);else reject(new Error('Không thể xử lý ảnh'));
-      },'image/jpeg',0.88);
+      resolve(canvas.toDataURL('image/jpeg',0.6));
     };
     img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Không thể đọc ảnh'));};
     img.src=url;
   });
 }
+
 async function handleAvatarFile(e){
   const file=e.target.files&&e.target.files[0];
   if(!file)return;
@@ -1267,28 +1254,28 @@ async function handleAvatarFile(e){
   if(file.size>10*1024*1024){showToast('Ảnh quá lớn (tối đa 10MB)');return;}
   if(!currentUser){showToast('Chưa sẵn sàng, thử lại sau');return;}
   const btn=document.getElementById('btn-change-avatar');
-  if(btn){btn.disabled=true;btn.textContent='Đang tải ảnh lên…';}
+  if(btn){btn.disabled=true;btn.textContent='Đang xử lý ảnh…';}
   try{
-    const blob=await resizeImageFile(file,320);
-    const {db,doc,updateDoc,storage,storageRef,uploadBytes,getDownloadURL,updateProfile,auth}=window.__fb;
-    const path='avatars/'+currentUser.uid+'.jpg';
-    const ref=storageRef(storage,path);
-    await uploadBytes(ref,blob,{contentType:'image/jpeg'});
-    const url=await getDownloadURL(ref);
-    const bust=url+(url.includes('?')?'&':'?')+'t='+Date.now();
-    await updateDoc(doc(db,'users',currentUser.uid),{photoURL:bust,updatedAt:window.__fb.serverTimestamp()});
-    try{ if(updateProfile) await updateProfile(auth.currentUser,{photoURL:bust}); }catch(_e){/* optional */}
-    currentProfile={...(currentProfile||{}),photoURL:bust};
+    const base64=await fileToBase64Avatar(file,150);
+    if(base64.length>900000){
+      showToast('Ảnh vẫn quá lớn sau khi nén, thử ảnh khác');
+      return;
+    }
+    const {db,doc,updateDoc,serverTimestamp}=window.__fb;
+    await updateDoc(doc(db,'users',currentUser.uid),{
+      photoURL: base64,
+      updatedAt: serverTimestamp()
+    });
+    currentProfile={...(currentProfile||{}),photoURL:base64};
     renderAuthSlot();
     showToast('Đã cập nhật ảnh đại diện!');
   }catch(err){
-    console.error(err);
-    showToast('Không thể tải ảnh lên: '+(err.code||err.message||''));
+    console.error('Avatar error:',err);
+    showToast('Không thể cập nhật ảnh: '+(err.code||err.message||''));
   }finally{
     if(btn){btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>Đổi ảnh đại diện';}
   }
 }
-
 fbReady(()=>{
   const {auth,onAuthStateChanged}=window.__fb;
   onAuthStateChanged(auth,async (user)=>{
