@@ -600,6 +600,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
   .btn-logout-sm{background:none;border:none;color:var(--soft);cursor:pointer;font-size:11px;font-family:var(--font);padding:4px 6px;border-radius:6px;flex-shrink:0;}
   .btn-logout-sm:hover{color:var(--warn);background:var(--warn-light);}
 
+  /* ── AVATAR EMOJI PICKER ── */
+  .avatar-emoji-row-label{font-size:11px;font-weight:700;color:var(--soft);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.06em;}
+  .emoji-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+  .emoji-opt{width:32px;height:32px;border-radius:9px;border:1.5px solid var(--border);background:var(--card-bg);font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s,background .15s,transform .15s;padding:0;}
+  .emoji-opt:hover{border-color:var(--purple);background:var(--purple-light);transform:translateY(-1px);}
+  .emoji-opt.selected{border-color:var(--purple);background:var(--purple);box-shadow:0 2px 10px rgba(108,99,255,0.35);}
+  .emoji-opt.emoji-none{font-size:12px;font-weight:700;color:var(--soft);}
+  .emoji-opt.emoji-none.selected{color:#fff;}
+
 
   /* ─── RESPONSIVE ─── */
   @media(max-width:768px){
@@ -669,9 +678,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
 
 
     <div class="sidebar-section-label" style="margin-top:8px;">Tương tác</div>
+    <a href="#forum" onclick="closeSidebar()"><div class="nav-icon">💬</div>Thảo luận</a>
     <a href="#quiz" onclick="closeSidebar()"><div class="nav-icon">📝</div>Trắc nghiệm</a>
     <a href="#survey" onclick="closeSidebar()"><div class="nav-icon">📊</div>Khảo sát</a>
-    <a href="#forum" onclick="closeSidebar()"><div class="nav-icon">💬</div>Thảo luận</a>
 
 
     <div class="sidebar-section-label" style="margin-top:8px;">Khác</div>
@@ -696,6 +705,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
         <span class="slider"></span>
       </div>
     </div>
+    <div class="avatar-emoji-row-label">😀 Biểu tượng đại diện (tuỳ chọn)</div>
+    <div class="emoji-grid" id="post-emoji-grid"></div>
     <label class="modal-label">Tên hiển thị</label>
     <input class="modal-input" id="post-name" placeholder="Nhập tên…" maxlength="30">
     <label class="modal-label">Tiêu đề</label>
@@ -866,6 +877,35 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
 </section>
 
 
+<section id="forum" class="forum-section">
+  <div class="forum-inner">
+    <div class="section-label">Cộng đồng</div>
+    <h2 class="section-title">Thảo luận mở</h2>
+    <p class="section-desc" style="margin-bottom:28px;">Chia sẻ góc nhìn, câu hỏi hoặc trải nghiệm của bạn về ASPD. Đăng nhập bằng Google hoặc chọn đăng ẩn danh.</p>
+    <div class="forum-feed" id="forum-feed">
+      <div class="forum-bar">
+        <span class="forum-count" id="forum-count-label">Đang tải…</span>
+        <div class="forum-actions">
+          <button class="sort-toggle-btn" onclick="fToggleSort()"><span id="f-sort-label">⇅ Mới nhất</span></button>
+          <button class="btn-new-post" onclick="openModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Bài mới</span>
+          </button>
+        </div>
+      </div>
+      <div id="posts-list"></div>
+    </div>
+    <div class="forum-detail" id="forum-detail">
+      <button class="back-btn" onclick="fGoBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Quay lại
+      </button>
+      <div id="detail-content"></div>
+    </div>
+  </div>
+</section>
+
+
 <section id="quiz" class="quiz-section">
   <div class="container">
     <div class="section-label" style="text-align:center;">Kiểm tra nhận thức</div>
@@ -913,35 +953,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--dark);line-height:
         <h3>Cảm ơn bạn đã tham gia!</h3>
         <p>Câu trả lời của bạn sẽ giúp chúng tôi hiểu hơn về nhận thức học sinh với chủ đề ASPD.</p>
       </div>
-    </div>
-  </div>
-</section>
-
-
-<section id="forum" class="forum-section">
-  <div class="forum-inner">
-    <div class="section-label">Cộng đồng</div>
-    <h2 class="section-title">Thảo luận mở</h2>
-    <p class="section-desc" style="margin-bottom:28px;">Chia sẻ góc nhìn, câu hỏi hoặc trải nghiệm của bạn về ASPD. Đăng nhập bằng Google hoặc chọn đăng ẩn danh.</p>
-    <div class="forum-feed" id="forum-feed">
-      <div class="forum-bar">
-        <span class="forum-count" id="forum-count-label">Đang tải…</span>
-        <div class="forum-actions">
-          <button class="sort-toggle-btn" onclick="fToggleSort()"><span id="f-sort-label">⇅ Mới nhất</span></button>
-          <button class="btn-new-post" onclick="openModal()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            <span>Bài mới</span>
-          </button>
-        </div>
-      </div>
-      <div id="posts-list"></div>
-    </div>
-    <div class="forum-detail" id="forum-detail">
-      <button class="back-btn" onclick="fGoBack()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-        Quay lại
-      </button>
-      <div id="detail-content"></div>
     </div>
   </div>
 </section>
@@ -1114,6 +1125,44 @@ function showToast(msg){
 
 
 /* ══════════════════════════════════════════
+   AVATAR EMOJI PICKER — used for profile,
+   new posts, and replies
+═══════════════════════════════════════════ */
+const AVATAR_EMOJIS=['😀','😎','🦊','🐱','🐼','🐧','🦉','🐢','🌟','🍀','🚀','⚡','🌙','☀️','🎨','🎧'];
+let selectedEmojis={post:'',reply:''};
+function fEmojiGridHtml(selected,onClickFn){
+  const opts=AVATAR_EMOJIS.map(e=>`<button type="button" class="emoji-opt${selected===e?' selected':''}" onclick="${onClickFn}('${e}',this)" title="Dùng biểu tượng ${e}">${e}</button>`).join('');
+  const noneSel=!selected?' selected':'';
+  return opts+`<button type="button" class="emoji-opt emoji-none${noneSel}" onclick="${onClickFn}('',this)" title="Không dùng biểu tượng">∅</button>`;
+}
+function fSetPostEmoji(emoji,btn){
+  document.querySelectorAll('#post-emoji-grid .emoji-opt').forEach(b=>b.classList.remove('selected'));
+  if(btn)btn.classList.add('selected');
+  selectedEmojis.post=emoji;
+}
+function fSetReplyEmoji(emoji,btn){
+  document.querySelectorAll('#reply-emoji-grid .emoji-opt').forEach(b=>b.classList.remove('selected'));
+  if(btn)btn.classList.add('selected');
+  selectedEmojis.reply=emoji;
+}
+async function fSetProfileEmoji(emoji,btn){
+  document.querySelectorAll('#auth-slot .emoji-opt').forEach(b=>b.classList.remove('selected'));
+  if(btn)btn.classList.add('selected');
+  if(!currentUser)return;
+  currentProfile={...(currentProfile||{}),avatarEmoji:emoji};
+  const avatarEl=document.getElementById('auth-trigger-avatar');
+  if(emoji){avatarEl.textContent=emoji;}
+  else if(currentProfile.photoURL){avatarEl.innerHTML=`<img src="${currentProfile.photoURL}" alt="">`;}
+  else{avatarEl.textContent=(currentProfile.displayName||'?')[0];}
+  try{
+    const {db,doc,updateDoc}=window.__fb;
+    await updateDoc(doc(db,'users',currentUser.uid),{avatarEmoji:emoji});
+    showToast(emoji?'Đã đổi biểu tượng đại diện':'Đã bỏ biểu tượng đại diện');
+  }catch(e){console.error(e);}
+}
+
+
+/* ══════════════════════════════════════════
    AUTH — Firebase (Google login + Anonymous)
 ═══════════════════════════════════════════ */
 let currentUser=null;      // Firebase user object (Google account OR anonymous)
@@ -1129,6 +1178,7 @@ async function ensureUserProfile(user){
     const profile={
       displayName: user.isAnonymous ? 'Khách ẩn danh' : (user.displayName||'Người dùng'),
       photoURL: user.isAnonymous ? '' : (user.photoURL||''),
+      avatarEmoji: '',
       isAnonymous: user.isAnonymous,
       coins: 0, level: 1,
       prefs: {},
@@ -1153,11 +1203,14 @@ function renderAuthSlot(){
     return;
   }
   const p=currentProfile||{};
-  if(p.photoURL){avatarEl.innerHTML=`<img src="${p.photoURL}" alt="">`;}
+  if(p.avatarEmoji){avatarEl.textContent=p.avatarEmoji;}
+  else if(p.photoURL){avatarEl.innerHTML=`<img src="${p.photoURL}" alt="">`;}
   else{avatarEl.textContent=(p.displayName||'?')[0];}
-  const avatarHtml = p.photoURL
-    ? `<img class="auth-avatar" src="${p.photoURL}" alt="">`
-    : `<div class="auth-avatar" style="display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--purple);">${(p.displayName||'?')[0]}</div>`;
+  const avatarHtml = p.avatarEmoji
+    ? `<div class="auth-avatar" style="display:flex;align-items:center;justify-content:center;font-size:16px;">${p.avatarEmoji}</div>`
+    : p.photoURL
+      ? `<img class="auth-avatar" src="${p.photoURL}" alt="">`
+      : `<div class="auth-avatar" style="display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--purple);">${(p.displayName||'?')[0]}</div>`;
   panel.innerHTML=`<div class="auth-box">
     <div class="auth-profile">
       ${avatarHtml}
@@ -1168,6 +1221,8 @@ function renderAuthSlot(){
     </div>
     <button class="btn-logout-sm" onclick="doLogout()">Thoát</button>
   </div>
+  <div class="avatar-emoji-row-label">😀 Đổi biểu tượng đại diện</div>
+  <div class="emoji-grid">${fEmojiGridHtml(p.avatarEmoji||'','fSetProfileEmoji')}</div>
   ${currentUser.isAnonymous?'<button class="btn-google" style="margin-top:10px;" onclick="loginGoogle()">Liên kết Google</button>':''}`;
 }
 
@@ -1287,6 +1342,7 @@ function fColor(n){let h=0;for(let c of n)h=(h*31+c.charCodeAt(0))%F_COLORS.leng
 function fTime(ts){if(!ts)return'vừa xong';const t=ts.toMillis?ts.toMillis():ts;const d=Date.now()-t;if(d<60000)return'vừa xong';if(d<3600000)return Math.floor(d/60000)+' phút trước';if(d<86400000)return Math.floor(d/3600000)+' giờ trước';if(d<604800000)return Math.floor(d/86400000)+' ngày trước';return new Date(t).toLocaleDateString('vi-VN');}
 function fEsc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');}
 function fAvatar(post){
+  if(post.avatarEmoji)return `<div class="f-avatar" style="background:${post.bg||'var(--purple-light)'};font-size:18px;">${post.avatarEmoji}</div>`;
   if(post.photoURL)return `<div class="f-avatar"><img src="${post.photoURL}" alt=""></div>`;
   return `<div class="f-avatar" style="background:${post.bg};color:${post.fg}">${post.initials}</div>`;
 }
@@ -1335,6 +1391,8 @@ function openModal(){
   const nameInput=document.getElementById('post-name');
   if(currentProfile&&!currentProfile.isAnonymous){ anonBox.checked=false; nameInput.disabled=false; nameInput.value=currentProfile.displayName; }
   else{ anonBox.checked=true; nameInput.disabled=true; nameInput.value='Khách ẩn danh'; }
+  selectedEmojis.post=(currentProfile&&currentProfile.avatarEmoji)||'';
+  document.getElementById('post-emoji-grid').innerHTML=fEmojiGridHtml(selectedEmojis.post,'fSetPostEmoji');
   setTimeout(()=>document.getElementById('post-title-input').focus(),50);
 }
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
@@ -1360,6 +1418,7 @@ async function submitPost(){
       initials: fInitials(name),
       bg: col.bg, fg: col.fg,
       photoURL: isAnon ? '' : (currentProfile&&currentProfile.photoURL) || '',
+      avatarEmoji: selectedEmojis.post||'',
       isAnonymous: isAnon,
       ts: serverTimestamp(),
       likes: 0, likedBy: [], replies: []
@@ -1367,6 +1426,7 @@ async function submitPost(){
     document.getElementById('post-title-input').value='';
     document.getElementById('post-body-input').value='';
     document.getElementById('post-char').textContent=MAX_POST+' chữ còn lại';
+    selectedEmojis.post='';
     closeModal();showToast('Đã đăng bài!');
   }catch(e){console.error(e);showToast('Lỗi khi đăng bài');}
   finally{btn.disabled=false;btn.textContent='Đăng bài';}
@@ -1439,13 +1499,14 @@ async function fSubmitReply(postId){
     authorUid: currentUser.uid, name, body,
     initials: fInitials(name), bg: col.bg, fg: col.fg,
     photoURL: isAnon?'':(currentProfile&&currentProfile.photoURL)||'',
+    avatarEmoji: selectedEmojis.reply||'',
     isAnonymous: isAnon,
     ts: Date.now(), likes:0, likedBy:[]
   };
   const {db,doc,updateDoc}=window.__fb;
   try{
     await updateDoc(doc(db,'posts',postId),{replies:[...(post.replies||[]),newReply]});
-    nameEl.value='';bodyEl.value='';showToast('Đã gửi bình luận');
+    nameEl.value='';bodyEl.value='';selectedEmojis.reply='';showToast('Đã gửi bình luận');
   }catch(e){console.error(e);showToast('Lỗi khi gửi bình luận');}
 }
 function fRenderDetail(id){
@@ -1464,7 +1525,8 @@ function fRenderDetail(id){
     repliesHtml=`<div class="f-empty" style="padding:24px 0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>Chưa có bình luận nào.</p></div>`;
   }
   const defaultReplyName=(currentProfile&&!currentProfile.isAnonymous)?currentProfile.displayName:'';
-  document.getElementById('detail-content').innerHTML=`<div class="original-post"><div class="post-header">${fAvatar(post)}<div class="f-meta"><div class="f-name">${fEsc(post.name)}${post.isAnonymous?'<span class="anon-tag">Ẩn danh</span>':''}</div><div class="f-time">${fTime(post.ts)}</div></div>${canDeletePost?`<button class="f-btn-delete" onclick="fDeletePost('${post.id}',event)">✕</button>`:''}</div><div class="f-post-title">${fEsc(post.title)}</div><div class="f-post-body full">${fEsc(post.body)}</div><div class="post-footer"><button class="f-act${liked?' liked':''}" onclick="fToggleLike('${post.id}',event)"><svg viewBox="0 0 24 24" fill="${liked?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span>${post.likes||0}</span></button></div></div>${repliesHtml}<div class="reply-composer-box" style="margin-top:12px"><div class="reply-composer-title">💬 Thêm bình luận</div><div class="anon-toggle-row"><label for="f-reply-anon">👤Bình luận ẩn danh</label><div class="anon-switch"><input type="checkbox" id="f-reply-anon" ${defaultReplyName?'':'checked'}><span class="slider"></span></div></div><input class="modal-input" id="f-reply-name" placeholder="Tên của bạn" maxlength="30" value="${fEsc(defaultReplyName)}" style="margin-bottom:8px"><textarea class="modal-textarea" id="f-reply-body" placeholder="Viết bình luận…" maxlength="${MAX_REPLY}" oninput="fUpdateReplyChar()" style="min-height:80px;margin-bottom:8px"></textarea><div style="display:flex;align-items:center;justify-content:space-between;"><span class="char-hint" id="f-reply-char">${MAX_REPLY} chữ còn lại</span><button class="btn-submit" onclick="fSubmitReply('${post.id}')">Gửi</button></div></div>`;
+  selectedEmojis.reply=(currentProfile&&currentProfile.avatarEmoji)||'';
+  document.getElementById('detail-content').innerHTML=`<div class="original-post"><div class="post-header">${fAvatar(post)}<div class="f-meta"><div class="f-name">${fEsc(post.name)}${post.isAnonymous?'<span class="anon-tag">Ẩn danh</span>':''}</div><div class="f-time">${fTime(post.ts)}</div></div>${canDeletePost?`<button class="f-btn-delete" onclick="fDeletePost('${post.id}',event)">✕</button>`:''}</div><div class="f-post-title">${fEsc(post.title)}</div><div class="f-post-body full">${fEsc(post.body)}</div><div class="post-footer"><button class="f-act${liked?' liked':''}" onclick="fToggleLike('${post.id}',event)"><svg viewBox="0 0 24 24" fill="${liked?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span>${post.likes||0}</span></button></div></div>${repliesHtml}<div class="reply-composer-box" style="margin-top:12px"><div class="reply-composer-title">💬 Thêm bình luận</div><div class="anon-toggle-row"><label for="f-reply-anon">👤Bình luận ẩn danh</label><div class="anon-switch"><input type="checkbox" id="f-reply-anon" ${defaultReplyName?'':'checked'}><span class="slider"></span></div></div><div class="avatar-emoji-row-label">😀 Biểu tượng đại diện (tuỳ chọn)</div><div class="emoji-grid" id="reply-emoji-grid">${fEmojiGridHtml(selectedEmojis.reply,'fSetReplyEmoji')}</div><input class="modal-input" id="f-reply-name" placeholder="Tên của bạn" maxlength="30" value="${fEsc(defaultReplyName)}" style="margin-bottom:8px"><textarea class="modal-textarea" id="f-reply-body" placeholder="Viết bình luận…" maxlength="${MAX_REPLY}" oninput="fUpdateReplyChar()" style="min-height:80px;margin-bottom:8px"></textarea><div style="display:flex;align-items:center;justify-content:space-between;"><span class="char-hint" id="f-reply-char">${MAX_REPLY} chữ còn lại</span><button class="btn-submit" onclick="fSubmitReply('${post.id}')">Gửi</button></div></div>`;
 }
 </script>
 </body>
